@@ -31,7 +31,11 @@
 
     `csv로 저장 == True` 이면 생성된 데이터를 (`샘플 크기`, 64)의 형태로  
 
-     `작업 디렉토리/8x8_Data/gen_samples/이름_gen_samples_*.csv`
+     `작업 디렉토리/8x8_Data/gen_samples/이름_gen_samples_raw.csv`
+     
+     or
+
+      `작업 디렉토리/8x8_Data/gen_samples/이름_gen_samples_normalized.csv`
      
      에 저장합니다.
 
