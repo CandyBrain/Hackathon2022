@@ -74,5 +74,5 @@ def sample_from_real_data(name):
 
 
 if __name__ == "__main__":
-    gen_sample_from_model("You", 100, unnormalize=False)
+    gen_sample_from_model("You", 100, as_csv=True, unnormalize=False)
     # sample_from_real_data("You")
