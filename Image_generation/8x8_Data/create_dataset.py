@@ -53,6 +53,9 @@ class Dataset(data.Dataset):
 def make_total_dataset(
     image_size, name_lookup_table, folder=None, exts=["csv"], use_name_as_label=False
 ):
+    """
+    folder: 8x8_Data의 상위폴더 지정
+    """
     PATH = str(Path.cwd())
     if folder is None:
         folder = PATH
