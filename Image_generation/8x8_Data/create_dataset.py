@@ -51,19 +51,25 @@ class Dataset(data.Dataset):
 
 
 def make_total_dataset(
-    image_size, name_lookup_table, folder=None, exts=["csv"], use_name_as_label=False
+    image_size,
+    name_lookup_table,
+    folder=None,
+    exts=["csv"],
+    use_name_as_label=False,
+    is_train=True,
 ):
     """
     folder: 8x8_Data의 상위폴더 지정
     """
     PATH = str(Path.cwd())
+    Bool_dict = {True: "images", False: "test_images"}
     if folder is None:
         folder = PATH
     names = name_lookup_table.keys()
     return data.ConcatDataset(
         [
             Dataset(
-                f"{folder}\8x8_Data\{name}\images",
+                f"{folder}\8x8_Data\{name}\{Bool_dict[is_train]}",
                 image_size=image_size,
                 name_lookup_table=name_lookup_table,
                 use_name_as_label=use_name_as_label,
