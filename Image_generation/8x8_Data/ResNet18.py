@@ -147,7 +147,6 @@ class Trainer:
 
     def load(self, milestone):
         data = torch.load(
-            data,
             str(
                 self.results_folder
                 / f"resnet18-{self.num_classes}classes-{milestone}.pt"
@@ -157,7 +156,7 @@ class Trainer:
         self.model.load_state_dict(data["model"])
         self.lookup_table = data["lookup_table"]
 
-    def train(self, device, target_label="pos"):
+    def train(self, device, target_label="name"):
         tgt_dict = {"name": 1, "pos": 2}
         tgt_idx = tgt_dict[target_label]
         cudnn.benchmark = True
