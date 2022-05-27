@@ -24,7 +24,7 @@ class Dataset(data.Dataset):
         self.image_size = image_size
         self.paths = [p for ext in exts for p in Path(f"{folder}").glob(f"**/*.{ext}")]
         self.pos_labels = torch.as_tensor(
-            np.array([int(str(p).split("\\")[-1][2]) for p in self.paths]),
+            np.array([(int(str(p).split("\\")[-1][2]) - 1) for p in self.paths]),
             dtype=torch.long,
         )
         self.transform = transforms.Compose(
