@@ -39,3 +39,38 @@
      
      에 저장합니다.
 
+4. `ResNet18.py`
+    `Trainer`객체를 생성하고 데이터를 불러와 학습시킵니다. 사람을 분류하는 작업을 간편하게 학습할 수 있습니다.
+    
+    ```python
+    from ResNet18 import Trainer
+
+
+    trainer = Trainer(
+        {"Lee1": 0, "Lee2": 1, "Moon": 2, "Shin": 3, "You": 4},
+        train_batch_size=32,
+        num_classes=5,
+    )
+    trainer.train("cuda", target_label="name")
+    ```
+
+    결과물은 `./backbone_results`에 저장되며, model만 불러올 경우 다음과 같이 사용합니다.
+
+    ```python
+    # some_path: path to data.pt 
+    model = ResNet(
+            BasicBlock,
+            [1, 1, 1, 1],
+            in_channels=1,
+            num_classes=6,
+        )
+
+    data = torch.load(
+            some_path
+            )
+
+    model.load_state_dict(data['model'])
+    ```
+
+
+
