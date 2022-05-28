@@ -66,6 +66,8 @@
             in_channels=1,
             num_classes=5,
         )
+    
+    model = nn.DataParallel(self.model.to(device))
 
     data = torch.load(
             some_path
