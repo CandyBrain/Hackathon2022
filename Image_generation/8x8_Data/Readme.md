@@ -51,7 +51,7 @@
         train_batch_size=32,
         num_classes=5,
     )
-    trainer.train("cuda", target_label="name")
+    trainer.train("cuda", pred_target="name")
     ```
 
     결과물은 `./backbone_results`에 저장되며, model만 불러올 경우 다음과 같이 사용합니다.
@@ -62,7 +62,7 @@
             BasicBlock,
             [1, 1, 1, 1],
             in_channels=1,
-            num_classes=6,
+            num_classes=5,
         )
 
     data = torch.load(
