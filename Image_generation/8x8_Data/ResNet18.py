@@ -158,11 +158,18 @@ class Trainer:
                 / f"resnet18-pred_{pred_target}-{self.num_classes}classes-{milestone}.pt"
             ),
         )
+        model_weights = {}
+        for k, v in data["model"].items():
+            name = k[7:]  # remove `module.`
+            model_weights[name] = v
         self.curr_epoch = data["epoch"]
-        self.model.load_state_dict(data["model"])
+        self.model.load_state_dict(model_weights)
         self.lookup_table = data["lookup_table"]
 
     def train(self, device, pred_target="name"):
+        init_epoch = self.curr_epoch
+        if init_epoch != 0:
+            self.curr_epoch += 1
         tgt_dict = {"name": 1, "pos": 2}
         tgt_label = tgt_dict[pred_target]
         cudnn.benchmark = True
@@ -170,8 +177,10 @@ class Trainer:
         optimizer = optim.SGD(
             self.model.parameters(), lr=self.train_lr, momentum=0.9, weight_decay=0.0002
         )
-        with tqdm(initial=self.curr_epoch, total=self.train_epochs) as pbar:
-            while self.curr_epoch < self.train_epochs:
+        with tqdm(
+            initial=self.curr_epoch, total=init_epoch + self.train_epochs
+        ) as pbar:
+            while self.curr_epoch <= init_epoch + self.train_epochs:
                 # adjust learning rate
                 if self.curr_epoch == 5 and self.adjust_lr == True:
                     for param_group in optimizer.param_groups:
@@ -245,5 +254,7 @@ if __name__ == "__main__":
         {"Lee1": 0, "Lee2": 1, "Moon": 2, "Shin": 3, "You": 4},
         train_batch_size=32,
         num_classes=5,
+        train_epochs=15,
     )
+    # trainer.load(10, "name")  # 10번째 model을 불러와서 추가적으로 train_epoch만큼 훈련시킴
     trainer.train("cuda", pred_target="name")

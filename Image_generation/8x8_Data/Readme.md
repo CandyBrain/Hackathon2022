@@ -51,6 +51,8 @@
         train_batch_size=32,
         num_classes=5,
     )
+    # trainer.load(10, "name")  # 10번째 model을 불러와서 추가적으로 train_epoch만큼 훈련시킴
+
     trainer.train("cuda", pred_target="name")
     ```
 
