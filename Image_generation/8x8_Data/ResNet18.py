@@ -131,7 +131,10 @@ class Trainer:
         self.adjust_lr = adjust_lr
         self.curr_epoch = 0
 
-    def save(self, milestone):
+    def save(self, milestone, pred_target):
+        """
+        pred_target: "pos" or "name"
+        """
         data = {
             "epoch": self.curr_epoch,
             "model": self.model.state_dict(),
@@ -141,24 +144,27 @@ class Trainer:
             data,
             str(
                 self.results_folder
-                / f"resnet18-{self.num_classes}classes-{milestone}.pt"
+                / f"resnet18-pred_{pred_target}-{self.num_classes}classes-{milestone}.pt"
             ),
         )
 
-    def load(self, milestone):
+    def load(self, milestone, pred_target):
+        """
+        pred_target: "pos" or "name"
+        """
         data = torch.load(
             str(
                 self.results_folder
-                / f"resnet18-{self.num_classes}classes-{milestone}.pt"
+                / f"resnet18-pred_{pred_target}-{self.num_classes}classes-{milestone}.pt"
             ),
         )
         self.curr_epoch = data["epoch"]
         self.model.load_state_dict(data["model"])
         self.lookup_table = data["lookup_table"]
 
-    def train(self, device, target_label="name"):
+    def train(self, device, pred_target="name"):
         tgt_dict = {"name": 1, "pos": 2}
-        tgt_idx = tgt_dict[target_label]
+        tgt_label = tgt_dict[pred_target]
         cudnn.benchmark = True
         self.model = nn.DataParallel(self.model.to(device))
         optimizer = optim.SGD(
@@ -180,7 +186,7 @@ class Trainer:
                     self.train_dl
                 ):  # batch = (inputs, name_label, pos_label)
                     inputs = batch[0].to(device)
-                    target = batch[tgt_idx].to(device)
+                    target = batch[tgt_label].to(device)
                     total += target.size(0)
                     optimizer.zero_grad()
 
@@ -200,7 +206,7 @@ class Trainer:
                             "Current benign train accuracy:",
                             str(pred.eq(target).sum().item() / target.size(0)),
                         )
-                        print("Current benign train loss:", loss.item())
+                        print("Current benign train loss:", 100 * loss.item())
 
                 print("\nTotal benign train accuarcy:", 100.0 * correct / total)
                 print("Total benign train loss:", train_loss)
@@ -215,7 +221,7 @@ class Trainer:
                     self.test_dl
                 ):  # batch = (inputs, name_label, pos_label)
                     inputs = batch[0].to(device)
-                    target = batch[tgt_idx].to(device)
+                    target = batch[tgt_label].to(device)
                     total += target.size(0)
 
                     outputs = self.model(inputs)
@@ -226,7 +232,7 @@ class Trainer:
 
                 print("\nTest accuarcy:", 100.0 * correct / total)
                 print("Test average loss:", loss / total)
-                self.save(self.curr_epoch)
+                self.save(milestone=self.curr_epoch, pred_target=pred_target)
                 print("Model Saved!")
 
                 # raise epoch
@@ -240,4 +246,4 @@ if __name__ == "__main__":
         train_batch_size=32,
         num_classes=5,
     )
-    trainer.train("cuda", target_label="name")
+    trainer.train("cuda", pred_target="name")
