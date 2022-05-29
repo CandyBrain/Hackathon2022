@@ -29,15 +29,15 @@
    
     모델을 불러오고, 데이터를 생성합니다. `이름 폴더명`, `샘플 크기`, `csv로 저장 여부`, `normalize 여부`를 지정합니다.
 
-    `csv로 저장 == True` 이면 생성된 데이터를 (`샘플 크기`, 64)의 형태로  
+    `csv로 저장 == True` 이면 생성된 데이터를(8,8)의 형태로  
 
-     `작업 디렉토리/8x8_Data/gen_samples/이름_gen_samples_raw.csv`
+    `작업 디렉토리/8x8_Data/이름/gen_images/Gen_raw_1.csv`
      
      or
 
-      `작업 디렉토리/8x8_Data/gen_samples/이름_gen_samples_normalized.csv`
+    `작업 디렉토리/8x8_Data/이름/gen_images/Gen_unnormalized_1.csv`
      
-     에 저장합니다.
+    에 저장합니다.
 
 4. `ResNet18.py`
     `Trainer`객체를 생성하고 데이터를 불러와 학습시킵니다. 사람을 분류하는 작업을 간편하게 학습할 수 있습니다.
@@ -66,6 +66,8 @@
             in_channels=1,
             num_classes=5,
         )
+    
+    model = nn.DataParallel(self.model.to(device))
 
     data = torch.load(
             some_path

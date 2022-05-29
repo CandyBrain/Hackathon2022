@@ -33,19 +33,22 @@ def gen_sample_from_model(name, n_samples=64, as_csv=True, unnormalize=True):
     trainer.load(29)
     trainer.ema_model.eval()
     gens = trainer.ema_model.sample(n_samples)
+    gens = gens.detach().cpu().numpy()
     BOOL_DICT = {True: "raw", False: "normalized"}
     if as_csv:
-        gens = gens.detach().cpu().numpy()
-        gens = gens.reshape(n_samples, 64)
+        Path.mkdir(Path(f"{PATH}\8x8_Data\{name}\gen_images"), exist_ok=True)
         if unnormalize:
             gens = (gens * 1023).round().astype(int16)
-        savetxt(
-            f"{PATH}\8x8_Data\gen_samples\\{name}_gen_samples_{BOOL_DICT[unnormalize]}.csv",
-            gens,
-            delimiter=",",
-        )
+        for idx, gen in enumerate(gens):
+            savetxt(
+                f"{PATH}\8x8_Data\{name}\gen_images\Gen_{BOOL_DICT[unnormalize]}_{idx}.csv",
+                gen.reshape(8, 8),
+                delimiter=",",
+            )
 
     else:
+        Path.mkdir(Path(f"{PATH}\8x8_Data\gen_samples"), exist_ok=True)
+        gens = gens.reshape(n_samples, 64)
         utils.save_image(
             gens,
             f"{PATH}\8x8_Data\gen_samples\\{name}_gen_samples.png",
